@@ -85,7 +85,7 @@ Alternatively, you can set AWS credentials using environment variables, which wi
 ## Additional Notes
 
 - The loggers object will contain a logger for each configured log stream.
-- Ensure your AWS credentials and region are correctly set either in the JSON file or via environment variables to allow proper logging to CloudWatch.
+- Ensure your AWS credentials and region are correctly set in the JSON file to allow proper logging to CloudWatch.
 - The JSON configuration approach allows for easy management and flexibility, especially when dealing with multiple log streams and dynamic environments.
 
 License
