@@ -17,7 +17,8 @@ Install the library using npm:
 
 ## Configuration
 
-Create a logger-config.json file in the root of your project. This file will contain your log group name, log streams, AWS region, and optionally, AWS credentials.
+Create a .logger-config.json file in the root of your project. This file will contain your log group name, log streams, AWS region, and optionally, AWS credentials.
+*Remember to add it to your .gitignore!*
 
 Example logger-config.json
 
