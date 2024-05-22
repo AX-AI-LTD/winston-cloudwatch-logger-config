@@ -1,6 +1,6 @@
 import { returnInstanceOrFactory } from "instance-or-factory";
-import fs from "node:fs";
-import path from "node:path";
+import fsInstance from "node:fs";
+import pathInstance from "node:path";
 
 /**
  * ConfigFactory is an async factory function that loads and returns the logger configuration from a .logger-config.json file.
