@@ -1,6 +1,6 @@
 {
-  "name": "winston-cloudwatch-logger-config",
-  "version": "0.1.0",
+  "name": "@axai/winston-cloudwatch-logger-config",
+  "version": "0.1.1",
   "type": "module",
   "description": "This is currently a pre-release version, deployed for testing.",
   "main": "./src/index.js",

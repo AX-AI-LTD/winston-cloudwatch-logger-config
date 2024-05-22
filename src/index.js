@@ -1,12 +1,7 @@
 import libWinston from "winston";
 import libWinstonCloudwatch from "winston-cloudwatch";
 import { returnInstanceOrFactory } from "instance-or-factory";
-import { getConfig } from "./configLoader.js";
-
-let configuration;
-if (process.env.NODE_ENV !== "test") {
-  configuration = getConfig();
-}
+import configuration from "./configLoader.js";
 
 /**
  * Factory function that creates and returns a set of loggers based on the provided configuration.
