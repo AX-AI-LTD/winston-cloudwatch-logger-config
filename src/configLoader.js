@@ -10,8 +10,8 @@ import pathInstance from "node:path";
  * @returns {Promise<Object>} A promise that resolves with the loaded configuration.
  * @throws {Error} Will throw an error if the configuration file does not exist or if the logStreams configuration is missing or empty.
  */
-const ConfigFactory = async ({ Fs, Path }) => {
-  const configPath = Path.resolve(process.cwd(), ".logger-config.json");
+const ConfigFactory = async ({ fs, path }) => {
+  const configPath = path.resolve(process.cwd(), ".logger-config.json");
 
   if (!Fs.existsSync(configPath)) {
     throw new Error(`Configuration file not found: ${configPath}`);
