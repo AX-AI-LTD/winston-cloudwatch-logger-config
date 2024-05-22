@@ -17,7 +17,7 @@ const ConfigFactory = async ({ fs, path }) => {
     throw new Error(`Configuration file not found: ${configPath}`);
   }
 
-  const config = JSON.parse(Fs.readFileSync(configPath, "utf-8"));
+  const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
 
   if (!config || !config.logStreams || config.logStreams.length === 0) {
     throw new Error(
