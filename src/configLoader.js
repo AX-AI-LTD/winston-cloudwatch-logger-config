@@ -2,6 +2,14 @@ import { returnInstanceOrFactory } from "instance-or-factory";
 import fs from "node:fs";
 import path from "node:path";
 
+/**
+ * ConfigFactory is an async factory function that loads and returns the logger configuration from a .logger-config.json file.
+ * @param {Object} param0 - An object containing the dependencies for the function.
+ * @param {Object} param0.Fs - The Node.js fs module.
+ * @param {Object} param0.Path - The Node.js path module.
+ * @returns {Promise<Object>} A promise that resolves with the loaded configuration.
+ * @throws {Error} Will throw an error if the configuration file does not exist or if the logStreams configuration is missing or empty.
+ */
 const ConfigFactory = async ({ Fs, Path }) => {
   const configPath = Path.resolve(process.cwd(), ".logger-config.json");
 
@@ -20,9 +28,9 @@ const ConfigFactory = async ({ Fs, Path }) => {
   return config;
 };
 
-const ConfigLoader = await returnInstanceOrFactory({
+const instanceOrFactory = await returnInstanceOrFactory({
   factory: ConfigFactory,
   args: { Fs: fs, Path: path },
 });
 
-export default ConfigLoader;
+export default instanceOrFactory;
