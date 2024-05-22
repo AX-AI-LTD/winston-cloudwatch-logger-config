@@ -44,7 +44,7 @@ describe("LoggersFactory", () => {
   const mockWinstonCloudwatch = vi.fn();;
 
   beforeEach(() => {
-   
+   restoreAllMocks();
   });
 
   it("should create file logger", () => {
