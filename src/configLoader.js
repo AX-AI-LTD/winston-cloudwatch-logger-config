@@ -30,7 +30,7 @@ const ConfigFactory = async ({ fs, path }) => {
 
 const instanceOrFactory = await returnInstanceOrFactory({
   factory: ConfigFactory,
-  args: { Fs: fs, Path: path },
+  args: { fs: fsInstance, path: pathInstance },
 });
 
 export default instanceOrFactory;
