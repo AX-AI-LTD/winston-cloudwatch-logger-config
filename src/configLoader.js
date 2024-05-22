@@ -1,17 +1,17 @@
+import { returnInstanceOrFactory } from "instance-or-factory";
 import fs from "node:fs";
 import path from "node:path";
 
-// Function to load configuration from a JSON file
-export const getConfig = () => {
-  const configPath = path.resolve(process.cwd(), ".logger-config.json");
+const ConfigFactory = async ({ Fs, Path }) => {
+  const configPath = Path.resolve(process.cwd(), ".logger-config.json");
 
-  if (!fs.existsSync(configPath)) {
+  if (!Fs.existsSync(configPath)) {
     throw new Error(`Configuration file not found: ${configPath}`);
   }
 
-  const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  const config = JSON.parse(Fs.readFileSync(configPath, "utf-8"));
 
-  if (!config || config.logStreams.length === 0) {
+  if (!config || !config.logStreams || config.logStreams.length === 0) {
     throw new Error(
       "Missing required logstreams configuration for logger. Please check your logger-config.json file or see the documentation for more information."
     );
@@ -19,3 +19,10 @@ export const getConfig = () => {
 
   return config;
 };
+
+const ConfigLoader = await returnInstanceOrFactory({
+  factory: ConfigFactory,
+  args: { Fs: fs, Path: path },
+});
+
+export default ConfigLoader;
