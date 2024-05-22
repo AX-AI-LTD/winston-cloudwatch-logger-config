@@ -81,6 +81,11 @@ loggers.yourLogGroupName.info('This is a CloudWatch log message');
 
 Alternatively, you can set AWS credentials using environment variables, which will override those specified in the logger-config.json file:
 
+```.env
+AWS_ACCESS_KEY_ID=yourAwsAccessKeyId
+AWS_SECRET_ACCESS_KEY=yourAwsSecretAccessKey
+```
+
 
 ## Additional Notes
 
