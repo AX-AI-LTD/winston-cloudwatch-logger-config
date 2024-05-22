@@ -32,7 +32,7 @@ describe("getConfig", () => {
     mockFs.existsSync.mockReturnValue(true);
     mockPath.resolve.mockReturnValue(mockConfigPath);
 
-    const config = await getConfig({ Fs: mockFs, Path: mockPath });
+    const config = await getConfig({ fs: mockFs, path: mockPath });
 
     expect(config).toEqual(JSON.parse(mockConfigContent));
   });
@@ -42,7 +42,7 @@ describe("getConfig", () => {
     mockPath.resolve.mockReturnValue(mockConfigPath);
 
     await expect(
-      getConfig({ Fs: mockFs, Path: mockPath })
+      getConfig({ fs: mockFs, path: mockPath })
     ).rejects.toThrowError(`Configuration file not found: ${mockConfigPath}`);
   });
 
@@ -53,7 +53,7 @@ describe("getConfig", () => {
     mockPath.resolve.mockReturnValue(mockConfigPath);
 
     await expect(
-      getConfig({ Fs: mockFs, Path: mockPath })
+      getConfig({ fs: mockFs, path: mockPath })
     ).rejects.toThrowError(
       "Missing required logstreams configuration for logger. Please check your logger-config.json file or see the documentation for more information."
     );

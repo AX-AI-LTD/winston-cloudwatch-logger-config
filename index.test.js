@@ -2,56 +2,49 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import LoggersFactory from "./src/index.js";
 
 describe("LoggersFactory", () => {
-  let mockConfig;
-  let mockGetConfig;
-  let mockWinston;
-  let mockWinstonCloudwatch;
+  const mockConfig = {
+    logStreams: [
+      {
+        logGroupName: "file",
+        level: "info",
+        path: "logfile.log",
+        logStreamName: "fileLogger",
+      },
+      {
+        logGroupName: "console",
+        level: "debug",
+        logStreamName: "consoleLogger",
+      },
+      {
+        logGroupName: "cloudwatch",
+        level: "error",
+        logStreamName: "cloudwatchLogger",
+      },
+    ],
+    keys: {
+      accessKeyId: "testAccessKeyId",
+      secretAccessKey: "testSecretAccessKey",
+    },
+  };
+
+  const mockWinston = {
+    createLogger: vi.fn().mockReturnValue({
+      fileLogger: {},
+      consoleLogger: {},
+      cloudwatchLogger: {},
+    }),
+    format: {
+      json: vi.fn(),
+    },
+    transports: {
+      File: vi.fn(),
+      Console: vi.fn(),
+    },
+  };
+  const mockWinstonCloudwatch = vi.fn();;
 
   beforeEach(() => {
-    mockConfig = {
-      logStreams: [
-        {
-          logGroupName: "file",
-          level: "info",
-          path: "logfile.log",
-          logStreamName: "fileLogger",
-        },
-        {
-          logGroupName: "console",
-          level: "debug",
-          logStreamName: "consoleLogger",
-        },
-        {
-          logGroupName: "cloudwatch",
-          level: "error",
-          logStreamName: "cloudwatchLogger",
-        },
-      ],
-      keys: {
-        accessKeyId: "testAccessKeyId",
-        secretAccessKey: "testSecretAccessKey",
-      },
-    };
-
-    mockWinston = {
-      createLogger: vi.fn().mockReturnValue({
-        fileLogger: {},
-        consoleLogger: {},
-        cloudwatchLogger: {},
-      }),
-      format: {
-        json: vi.fn(),
-      },
-      transports: {
-        File: vi.fn(),
-        Console: vi.fn(),
-      },
-    };
-
-    mockWinstonCloudwatch = vi.fn();
-
-    mockGetConfig = vi.fn();
-    mockGetConfig.mockReturnValue(mockConfig);
+   
   });
 
   it("should create file logger", () => {
