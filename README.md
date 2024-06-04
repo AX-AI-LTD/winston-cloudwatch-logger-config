@@ -13,7 +13,7 @@ A simple and configurable Winston logger setup for Node.js applications, support
 
 Install the library using npm:
 
-`npm install winston-cloudwatch-logger-config`
+```npm install @axai/winston-cloudwatch-logger-config```
 
 ## Configuration
 
