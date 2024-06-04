@@ -2,6 +2,7 @@ import libWinston from "winston";
 import libWinstonCloudwatch from "winston-cloudwatch";
 import { returnInstanceOrFactory } from "instance-or-factory";
 import configuration from "./configLoader.js";
+import LogFactory from "./LogFactory.js";
 
 /**
  * Factory function that creates and returns a set of loggers based on the provided configuration.
@@ -55,6 +56,8 @@ const LoggersFactory = ({ config, winston, WinstonCloudwatch }) => {
       acc[stream.logStreamName] = createLogger(stream, config.keys);
       return acc;
     }, {});
+
+    loggers.LogFactory = LogFactory;
 
     return loggers;
   } catch (error) {

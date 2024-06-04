@@ -24,7 +24,7 @@ describe("getConfig", () => {
   });
 
   beforeEach(() => {
-    vi.resetAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("should load configuration from a JSON file", async () => {

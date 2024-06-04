@@ -28,11 +28,7 @@ describe("LoggersFactory", () => {
   };
 
   const mockWinston = {
-    createLogger: vi.fn().mockReturnValue({
-      fileLogger: {},
-      consoleLogger: {},
-      cloudwatchLogger: {},
-    }),
+    createLogger: vi.fn(),
     format: {
       json: vi.fn(),
     },
@@ -41,15 +37,18 @@ describe("LoggersFactory", () => {
       Console: vi.fn(),
     },
   };
-  const mockWinstonCloudwatch = vi.fn();;
+
+  const mockWinstonCloudwatch = vi.fn();
 
   beforeEach(() => {
-   restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("should create file logger", () => {
-    const fileTransport = { filename: "logfile.log" };
+    const fileTransport = {};
+    const logger = { log: vi.fn() };
     mockWinston.transports.File.mockReturnValue(fileTransport);
+    mockWinston.createLogger.mockReturnValue(logger);
 
     const loggers = LoggersFactory({
       config: mockConfig,
@@ -67,7 +66,9 @@ describe("LoggersFactory", () => {
 
   it("should create console logger", () => {
     const consoleTransport = {};
+    const logger = { log: vi.fn() };
     mockWinston.transports.Console.mockReturnValue(consoleTransport);
+    mockWinston.createLogger.mockReturnValue(logger);
 
     const loggers = LoggersFactory({
       config: mockConfig,
@@ -85,7 +86,9 @@ describe("LoggersFactory", () => {
 
   it("should create cloudwatch logger", () => {
     const cloudwatchTransport = {};
+    const logger = { log: vi.fn() };
     mockWinstonCloudwatch.mockReturnValue(cloudwatchTransport);
+    mockWinston.createLogger.mockReturnValue(logger);
 
     const loggers = LoggersFactory({
       config: mockConfig,
@@ -103,6 +106,7 @@ describe("LoggersFactory", () => {
 
   it("should throw error if logger creation fails", () => {
     const faultyConfig = { ...mockConfig, logStreams: null };
+    
     expect(() =>
       LoggersFactory({
         config: faultyConfig,

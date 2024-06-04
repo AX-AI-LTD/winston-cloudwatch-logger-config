@@ -1,0 +1,2 @@
+const mockWinston = {};
+const mockWinstonCloudwatch = {};
