@@ -13,12 +13,12 @@ A simple and configurable Winston logger setup for Node.js applications, support
 
 Install the library using npm:
 
-```npm install winston-cloudwatch-logger-config```
+`npm install winston-cloudwatch-logger-config`
 
 ## Configuration
 
 Create a .logger-config.json file in the root of your project. This file will contain your log group name, log streams, AWS region, and optionally, AWS credentials.
-*Remember to add it to your .gitignore!*
+_Remember to add it to your .gitignore!_
 
 Example logger-config.json
 
@@ -33,7 +33,7 @@ Example logger-config.json
       "logGroupName": "yourLogGroupName", // the default type of logging is Cloudwatch
       "logStreamName": "yourLogStreamName",
       "awsRegion": "yourAwsRegion",
-      "level": "error",
+      "level": "error"
     },
     {
       "logGroupName": "file", // but you can also specify "file" to log to a file
@@ -48,14 +48,14 @@ Example logger-config.json
   ]
 }
 ```
-- ```accessKeyId```: Your AWS access key ID.
-- ```secretAccessKey```: Your AWS secret access key.
-- ```logGroupName```: The name of the CloudWatch log group, or the special values "file" or "console" to log to a file or the console.
-- ```logStreams```: An array of log stream configurations, each with a name and level.
-- ```awsRegion```: The AWS region where your CloudWatch log group is located.
-- ```level```: The log level for the stream (e.g., "error", "info", "debug").
-- ```path```: The path to the log file when logging to a file.
 
+- `accessKeyId`: Your AWS access key ID.
+- `secretAccessKey`: Your AWS secret access key.
+- `logGroupName`: The name of the CloudWatch log group, or the special values "file" or "console" to log to a file or the console.
+- `logStreams`: An array of log stream configurations, each with a name and level.
+- `awsRegion`: The AWS region where your CloudWatch log group is located.
+- `level`: The log level for the stream (e.g., "error", "info", "debug").
+- `path`: The path to the log file when logging to a file.
 
 ## Usage
 
@@ -66,15 +66,14 @@ Ensure your logger-config.json is in the root directory of your project.
 Use the loggers in your application:
 
 ```javascript
-
-import loggers from 'winston-cloudwatch-logger-config';
+import loggers from "winston-cloudwatch-logger-config";
 
 logger.forEach((logger) => {
-  logger.info('This is an info message');
-  logger.error('This is an error message');
-})
+  logger.info("This is an info message");
+  logger.error("This is an error message");
+});
 
-loggers.yourLogGroupName.info('This is a CloudWatch log message');
+loggers.yourLogGroupName.info("This is a CloudWatch log message");
 ```
 
 ## Environment Variables
@@ -92,6 +91,16 @@ AWS_SECRET_ACCESS_KEY=yourAwsSecretAccessKey
 - Ensure your AWS credentials and region are correctly set in the JSON file to allow proper logging to CloudWatch.
 - The JSON configuration approach allows for easy management and flexibility, especially when dealing with multiple log streams and dynamic environments.
 
-License
+## Release Notes (0.2.0)
+
+The loggers object now includes a LogFactory method which creates logs in a given format.
+
+## Usage example:
+
+```javascript
+loggers.yourLogGroupName.info(loggers.LogFactory("info", { message: "This is an info message" }););
+```
+
+## License
 
 Copyright AX-AI LTD 2024. ISC License. See LICENSE file for details.
