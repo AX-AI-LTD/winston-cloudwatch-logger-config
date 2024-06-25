@@ -5,11 +5,25 @@
   "description": "This is currently a pre-release version, deployed for testing.",
   "main": "./src/index.js",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "eslint --fix \"**/*.{js,cjs,mjs,jsx}\" && echo \"\\033[32mNo Lint Errors\\033[0m\"",
+    "format": "echo \"Files formatted:\"; prettier -w **/* -l && echo \"\n\\033[32mFormatting Complete\\033[0m\""
   },
   "author": "therealseanwallace - https://github.com/therealseanwallace",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/eslint-parser": "^7.24.7",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-jsconfig": "^1.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^17.9.0",
+    "eslint-plugin-promise": "^6.2.0",
+    "eslint-plugin-unicorn": "^54.0.0",
+    "prettier": "^3.3.2",
     "vitest": "^1.6.0"
   },
   "dependencies": {

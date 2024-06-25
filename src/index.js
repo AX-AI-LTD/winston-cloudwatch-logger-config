@@ -17,7 +17,7 @@ import LogFactory from "./LogFactory.js";
  */
 const LoggersFactory = ({ config, winston, WinstonCloudwatch }) => {
   try {
-    const createLogger = (stream, keys) => {
+    const createLogger = (stream) => {
       if (stream.logGroupName === "file")
         return winston.createLogger({
           level: stream.level,
@@ -43,9 +43,8 @@ const LoggersFactory = ({ config, winston, WinstonCloudwatch }) => {
         transports: [
           new WinstonCloudwatch({
             ...stream,
-            awsAccessKeyId: keys.accessKeyId || process.env.AWS_ACCESS_KEY_ID,
-            awsSecretKey:
-              keys.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY,
+            awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
           }),
         ],
       });
@@ -53,7 +52,7 @@ const LoggersFactory = ({ config, winston, WinstonCloudwatch }) => {
 
     // Create loggers for each log stream
     const loggers = config.logStreams.reduce((acc, stream) => {
-      acc[stream.logStreamName] = createLogger(stream, config.keys);
+      acc[stream.logStreamName] = createLogger(stream);
       return acc;
     }, {});
 

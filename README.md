@@ -17,17 +17,12 @@ Install the library using npm:
 
 ## Configuration
 
-Create a .logger-config.json file in the root of your project. This file will contain your log group name, log streams, AWS region, and optionally, AWS credentials.
-_Remember to add it to your .gitignore!_
+Create a .logger-config.json file in the root of your project. This file will contain your log group name, log streams, and AWS region.
 
 Example logger-config.json
 
 ```json
 {
-  "keys": {
-    "accessKeyId": "yourAccessKeyId",
-    "secretAccessKey": "yourSecretAccessKey"
-  },
   "logStreams": [
     {
       "logGroupName": "yourLogGroupName", // the default type of logging is Cloudwatch
@@ -79,11 +74,6 @@ loggers.yourLogGroupName.info("This is a CloudWatch log message");
 ## Environment Variables
 
 Alternatively, if it is more convenient for your environment, you can set AWS credentials using environment variables, which will be used in the event that they are not specified in the logger-config.json file:
-
-```.env
-AWS_ACCESS_KEY_ID=yourAwsAccessKeyId
-AWS_SECRET_ACCESS_KEY=yourAwsSecretAccessKey
-```
 
 ## Additional Notes
 

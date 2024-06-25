@@ -21,7 +21,7 @@ const ConfigFactory = async ({ fs, path }) => {
 
   if (!config || !config.logStreams || config.logStreams.length === 0) {
     throw new Error(
-      "Missing required logstreams configuration for logger. Please check your logger-config.json file or see the documentation for more information."
+      "Missing required logstreams configuration for logger. Please check your logger-config.json file or see the documentation for more information.",
     );
   }
 
