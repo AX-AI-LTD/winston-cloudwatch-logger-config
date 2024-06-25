@@ -44,8 +44,7 @@ const LoggersFactory = ({ config, winston, WinstonCloudwatch }) => {
           new WinstonCloudwatch({
             ...stream,
             awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            awsSecretKey:
-              process.env.AWS_SECRET_ACCESS_KEY,
+            awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
           }),
         ],
       });

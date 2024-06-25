@@ -8,7 +8,12 @@ import nodePath from "node:path";
  * @param {Object} [properties={}] - Additional properties to include in the log entry.
  * @returns {Object} The log entry, which includes a timestamp, the log level, application information, and any additional properties.
  */
-const LogFactory = async (level, properties = {}, fs = nodeFs, path = nodePath) => {
+const LogFactory = async (
+  level,
+  properties = {},
+  fs = nodeFs,
+  path = nodePath,
+) => {
   try {
     // Load the configuration file
     const configPath = path.resolve(process.cwd(), ".logger-config.json");
