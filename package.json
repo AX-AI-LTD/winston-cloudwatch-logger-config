@@ -7,7 +7,8 @@
   "scripts": {
     "test": "vitest",
     "lint": "eslint --fix \"**/*.{js,cjs,mjs,jsx}\" && echo \"\\033[32mNo Lint Errors\\033[0m\"",
-    "format": "echo \"Files formatted:\"; prettier -w **/* -l && echo \"\n\\033[32mFormatting Complete\\033[0m\""
+    "format": "echo \"Files formatted:\"; prettier -w **/* -l && echo \"\n\\033[32mFormatting Complete\\033[0m\"",
+    "publish": "npm publish --access public"
   },
   "author": "therealseanwallace - https://github.com/therealseanwallace",
   "license": "ISC",
