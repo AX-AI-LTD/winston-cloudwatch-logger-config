@@ -177,8 +177,7 @@ export default instanceOrFactory;
 
 try {
   const testLoggers = await instanceOrFactory;
-  const testLogger = testLoggers[0]; //
-  testLogger.info("Cloudwatch logging initialized successfully!");
+  testLoggers.application.info("Cloudwatch logging initialized successfully!");
 } catch (error) {
   console.error(`Error during logging test: ${error.message}`);
 }
