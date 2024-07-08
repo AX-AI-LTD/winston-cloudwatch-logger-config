@@ -99,7 +99,6 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
   try {
     const createLogger = async (stream) => {
       if (stream.logGroupName === "file") {
-        console.log(`Creating file logger for path: ${stream.path}`);
         return winston.createLogger({
           level: stream.level,
           format: winston.format.json(),
@@ -112,7 +111,6 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
       }
 
       if (stream.logGroupName === "console") {
-        console.log(`Creating console logger`);
         return winston.createLogger({
           level: stream.level,
           format: winston.format.json(),
@@ -123,11 +121,6 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
       // Ensure log group and log stream exist if not using file or console
       await ensureLogGroupExists(stream.logGroupName);
       await ensureLogStreamExists(stream.logGroupName, stream.logStreamName);
-
-      // Log stream details for debugging
-      console.log(
-        `Creating CloudWatch logger for group: ${stream.logGroupName}, stream: ${stream.logStreamName}`,
-      );
 
       // Use the CloudWatch transport
       return winston.createLogger({
@@ -145,15 +138,15 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
       });
     };
 
-    // Create loggers for each log stream
-    const loggers = await Promise.all(
-      config.logStreams.map(async (stream) => {
-        const logger = await createLogger(stream);
-        return { [stream.logStreamName]: logger };
-      }),
-    );
+    // Create loggers for each log stream consecutively so that we don't create a conflict in AWS when trying to create log groups and streams
+    const loggersObject = {};
+    for (let i = 0; i < config.logStreams.length; i += 1) {
+      const stream = config.logStreams[i];
+      // eslint-disable-next-line no-await-in-loop
+      const logger = await createLogger(stream);
+      loggersObject[stream.logStreamName] = logger;
+    }
 
-    const loggersObject = Object.assign({}, ...loggers);
     loggersObject.LogFactory = LogFactory;
 
     return loggersObject;
