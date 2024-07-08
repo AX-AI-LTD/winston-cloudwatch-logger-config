@@ -66,16 +66,16 @@ async function ensureLogStreamExists(logGroupName, logStreamName) {
       (stream) => stream.logStreamName === logStreamName,
     );
 
-    if (!logStreamExists) {
-      const createLogStreamCommand = new CreateLogStreamCommand({
-        logGroupName,
-        logStreamName,
-      });
-      await cloudWatchLogsClient.send(createLogStreamCommand);
-      console.log(`CloudWatch Log Stream created: ${logStreamName}`);
-    } else {
+    if (logStreamExists) {
       console.log(`CloudWatch Log Stream already exists: ${logStreamName}`);
+      return;
     }
+    const createLogStreamCommand = new CreateLogStreamCommand({
+      logGroupName,
+      logStreamName,
+    });
+    await cloudWatchLogsClient.send(createLogStreamCommand);
+    console.log(`CloudWatch Log Stream created: ${logStreamName}`);
   } catch (error) {
     if (error.name !== "ResourceAlreadyExistsException") {
       console.error(`Error ensuring log stream exists: ${error.message}`);
