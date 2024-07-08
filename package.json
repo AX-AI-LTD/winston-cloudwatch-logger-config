@@ -27,6 +27,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.609.0",
     "instance-or-factory": "^1.0.2",
     "winston": "^3.13.0",
     "winston-cloudwatch": "^6.3.0"
