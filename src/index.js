@@ -32,13 +32,13 @@ async function ensureLogGroupExists(logGroupName) {
       (group) => group.logGroupName === logGroupName,
     );
 
-    if (!logGroupExists) {
-      const createLogGroupCommand = new CreateLogGroupCommand({ logGroupName });
-      await cloudWatchLogsClient.send(createLogGroupCommand);
-      console.log(`CloudWatch Log Group created: ${logGroupName}`);
-    } else {
+    if (logGroupExists) {
       console.log(`CloudWatch Log Group already exists: ${logGroupName}`);
+      return;
     }
+    const createLogGroupCommand = new CreateLogGroupCommand({ logGroupName });
+    await cloudWatchLogsClient.send(createLogGroupCommand);
+    console.log(`CloudWatch Log Group created: ${logGroupName}`);
   } catch (error) {
     if (error.name !== "ResourceAlreadyExistsException") {
       console.error(`Error ensuring log group exists: ${error.message}`);
