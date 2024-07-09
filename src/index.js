@@ -14,16 +14,12 @@ import LogFactory from "./LogFactory.js";
 
 dotenv.config();
 
-const cloudWatchLogsClient = new CloudWatchLogsClient({
-  region: configuration.application.awsRegion,
-});
-
 /**
  * Ensures that the specified CloudWatch log group exists, and creates it if it does not.
  *
  * @param {string} logGroupName - The name of the log group.
  */
-async function ensureLogGroupExists(logGroupName) {
+async function ensureLogGroupExists({ logGroupName, cloudWatchLogsClient }) {
   try {
     const describeLogGroupsCommand = new DescribeLogGroupsCommand({
       logGroupNamePrefix: logGroupName,
@@ -56,7 +52,11 @@ async function ensureLogGroupExists(logGroupName) {
  * @param {string} logGroupName - The name of the log group.
  * @param {string} logStreamName - The name of the log stream.
  */
-async function ensureLogStreamExists(logGroupName, logStreamName) {
+async function ensureLogStreamExists({
+  logGroupName,
+  logStreamName,
+  cloudWatchLogsClient,
+}) {
   try {
     const describeLogStreamsCommand = new DescribeLogStreamsCommand({
       logGroupName,
@@ -100,6 +100,10 @@ async function ensureLogStreamExists(logGroupName, logStreamName) {
  */
 const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
   try {
+    console.log("config: ", config);
+    const cloudWatchLogsClient = new CloudWatchLogsClient({
+      region: config.application.awsRegion,
+    });
     const createLogger = async (stream) => {
       if (stream.logGroupName === "file") {
         return winston.createLogger({
@@ -122,8 +126,15 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
       }
 
       // Ensure log group and log stream exist if not using file or console
-      await ensureLogGroupExists(stream.logGroupName);
-      await ensureLogStreamExists(stream.logGroupName, stream.logStreamName);
+      await ensureLogGroupExists({
+        logGroupName: stream.logGroupName,
+        cloudWatchLogsClient,
+      });
+      await ensureLogStreamExists({
+        logGroupName: stream.logGroupName,
+        logStreamName: stream.logStreamName,
+        cloudWatchLogsClient,
+      });
 
       // Use the CloudWatch transport
       return winston.createLogger({
