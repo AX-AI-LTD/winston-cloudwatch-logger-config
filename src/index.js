@@ -130,7 +130,7 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
           new WinstonCloudwatch({
             logGroupName: stream.logGroupName,
             logStreamName: stream.logStreamName,
-            awsRegion: process.env.AWS_REGION,
+            awsRegion: stream.awsRegion,
             awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
             awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
           }),
