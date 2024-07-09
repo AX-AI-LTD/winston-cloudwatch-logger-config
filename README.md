@@ -44,8 +44,6 @@ Example logger-config.json
 }
 ```
 
-- `accessKeyId`: Your AWS access key ID.
-- `secretAccessKey`: Your AWS secret access key.
 - `logGroupName`: The name of the CloudWatch log group, or the special values "file" or "console" to log to a file or the console.
 - `logStreams`: An array of log stream configurations, each with a name and level.
 - `awsRegion`: The AWS region where your CloudWatch log group is located.

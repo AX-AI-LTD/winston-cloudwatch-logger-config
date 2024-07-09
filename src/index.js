@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import libWinston from "winston";
 import libWinstonCloudwatch from "winston-cloudwatch";
 import { returnInstanceOrFactory } from "instance-or-factory";
@@ -10,6 +11,8 @@ import {
 } from "@aws-sdk/client-cloudwatch-logs"; // AWS SDK v3
 import configuration from "./configLoader.js";
 import LogFactory from "./LogFactory.js";
+
+dotenv.config();
 
 const cloudWatchLogsClient = new CloudWatchLogsClient({
   region: process.env.AWS_REGION,
