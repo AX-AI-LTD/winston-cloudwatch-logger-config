@@ -15,7 +15,7 @@ import LogFactory from "./LogFactory.js";
 dotenv.config();
 
 const cloudWatchLogsClient = new CloudWatchLogsClient({
-  region: process.env.AWS_REGION,
+  region: configuration.application.awsRegion,
 });
 
 /**
@@ -29,10 +29,10 @@ async function ensureLogGroupExists(logGroupName) {
       logGroupNamePrefix: logGroupName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogGroupsCommand,
+      describeLogGroupsCommand
     );
     const logGroupExists = describeResponse.logGroups.some(
-      (group) => group.logGroupName === logGroupName,
+      (group) => group.logGroupName === logGroupName
     );
 
     if (logGroupExists) {
@@ -63,10 +63,10 @@ async function ensureLogStreamExists(logGroupName, logStreamName) {
       logStreamNamePrefix: logStreamName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogStreamsCommand,
+      describeLogStreamsCommand
     );
     const logStreamExists = describeResponse.logStreams.some(
-      (stream) => stream.logStreamName === logStreamName,
+      (stream) => stream.logStreamName === logStreamName
     );
 
     if (logStreamExists) {
@@ -133,7 +133,7 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
           new WinstonCloudwatch({
             logGroupName: stream.logGroupName,
             logStreamName: stream.logStreamName,
-            awsRegion: stream.awsRegion,
+            awsRegion: config.application.awsRegion,
             awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
             awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
           }),

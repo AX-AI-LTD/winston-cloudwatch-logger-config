@@ -23,25 +23,26 @@ Example logger-config.json
 
 ```json
 {
-  "logStreams": [
-    {
-      "logGroupName": "yourLogGroupName", // the default type of logging is Cloudwatch
-      "logStreamName": "yourLogStreamName",
-      "awsRegion": "yourAwsRegion",
-      "level": "error"
+    "application": {
+      "name": "yourAppName",
+      "version": "0.1.0",
+      "awsRegion": "eu-west-2"
     },
-    {
-      "logGroupName": "file", // but you can also specify "file" to log to a file
-      "logStreamName": "info",
-      "level": "error",
-      "path": "/path/to/your/log/file.log"
-    },
-    {
-      "logGroupName": "console", // or "console" to log to the console
-      "logStreamName": "console"
-    }
-  ]
-}
+    "logStreams": [
+      {
+        "logGroupName": "yourLogGroupName",
+        "logStreamName": "application",
+        "level": "info",
+        "type": "cloudwatch"
+      },
+      {
+        "logGroupName": "yourLogGroupName",
+        "logStreamName": "error",
+        "level": "error",
+        "type": "cloudwatch"
+      }
+    ]
+  }
 ```
 
 - `logGroupName`: The name of the CloudWatch log group, or the special values "file" or "console" to log to a file or the console.
