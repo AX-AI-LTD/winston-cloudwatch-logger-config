@@ -1,6 +1,6 @@
 {
   "name": "@axai/winston-cloudwatch-logger-config",
-  "version": "4.1.0",
+  "version": "6.0.0",
   "type": "module",
   "description": "This is currently a pre-release version, deployed for testing.",
   "main": "./src/index.js",
@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.609.0",
+    "dotenv": "^16.4.5",
     "instance-or-factory": "^1.0.2",
     "winston": "^3.13.0",
     "winston-cloudwatch": "^6.3.0"
