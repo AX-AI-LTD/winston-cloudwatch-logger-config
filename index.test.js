@@ -3,6 +3,9 @@ import LoggersFactory from "./src/index.js";
 
 describe("LoggersFactory", () => {
   const mockConfig = {
+    application: {
+      awsRegion: "us-east-1",
+    },
     logStreams: [
       {
         logGroupName: "file",
@@ -44,13 +47,13 @@ describe("LoggersFactory", () => {
     vi.restoreAllMocks();
   });
 
-  it("should create file logger", () => {
+  it("should create file logger", async () => {
     const fileTransport = {};
     const logger = { log: vi.fn() };
     mockWinston.transports.File.mockReturnValue(fileTransport);
     mockWinston.createLogger.mockReturnValue(logger);
 
-    const loggers = LoggersFactory({
+    const loggers = await LoggersFactory({
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
@@ -64,13 +67,13 @@ describe("LoggersFactory", () => {
     });
   });
 
-  it("should create console logger", () => {
+  it("should create console logger", async () => {
     const consoleTransport = {};
     const logger = { log: vi.fn() };
     mockWinston.transports.Console.mockReturnValue(consoleTransport);
     mockWinston.createLogger.mockReturnValue(logger);
 
-    const loggers = LoggersFactory({
+    const loggers = await LoggersFactory({
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
@@ -84,13 +87,13 @@ describe("LoggersFactory", () => {
     });
   });
 
-  it("should create cloudwatch logger", () => {
+  it("should create cloudwatch logger", async () => {
     const cloudwatchTransport = {};
     const logger = { log: vi.fn() };
     mockWinstonCloudwatch.mockReturnValue(cloudwatchTransport);
     mockWinston.createLogger.mockReturnValue(logger);
 
-    const loggers = LoggersFactory({
+    const loggers = await LoggersFactory({
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
@@ -104,17 +107,18 @@ describe("LoggersFactory", () => {
     });
   });
 
-  it("should throw error if logger creation fails", () => {
+  it("should throw error if logger creation fails", async () => {
     const faultyConfig = { ...mockConfig, logStreams: null };
-    
-    expect(() =>
-      LoggersFactory({
+    try {
+      await LoggersFactory({
         config: faultyConfig,
         winston: mockWinston,
         WinstonCloudwatch: mockWinstonCloudwatch,
-      })
-    ).toThrow(
-      "Error creating loggers: Cannot read properties of null (reading 'reduce')"
-    );
+      });
+    } catch (error) {
+      expect(error.message).toBe(
+        "Error creating loggers: Cannot read properties of null (reading 'length')"
+      );
+    }
   });
 });

@@ -25,10 +25,10 @@ async function ensureLogGroupExists({ logGroupName, cloudWatchLogsClient }) {
       logGroupNamePrefix: logGroupName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogGroupsCommand
+      describeLogGroupsCommand,
     );
     const logGroupExists = describeResponse.logGroups.some(
-      (group) => group.logGroupName === logGroupName
+      (group) => group.logGroupName === logGroupName,
     );
 
     if (logGroupExists) {
@@ -63,10 +63,10 @@ async function ensureLogStreamExists({
       logStreamNamePrefix: logStreamName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogStreamsCommand
+      describeLogStreamsCommand,
     );
     const logStreamExists = describeResponse.logStreams.some(
-      (stream) => stream.logStreamName === logStreamName
+      (stream) => stream.logStreamName === logStreamName,
     );
 
     if (logStreamExists) {
