@@ -1,15 +1,32 @@
----
-name: Pre-merge
+name: Pre-Merge Checks
+
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
+    types: [opened, synchronize, reopened]
 
 jobs:
+  check-target-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check target branch
+        run: |
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+          SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
+          
+          # Get the default branch of the repo (usually 'main' or 'master')
+          DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          
+          if [[ "$TARGET_BRANCH" == "$DEFAULT_BRANCH" && "$SOURCE_BRANCH" != "staging" ]]; then
+            echo "Only the staging branch can be merged into the $DEFAULT_BRANCH branch."
+            exit 1
+          fi
+          
+          echo "Pull request target branch is valid."
   eslint-prettier:
-    name: Eslint and Prettier
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -21,9 +38,11 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Authenticate remote origin
         run: |
-          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/AX-AI-LTD/winston-cloudwatch-logger-config.git
+          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/AX-AI-LTD/claimToolWebServer.git
+
       - name: Install ESLint and Prettier
         run: |
           npm install eslint@8.57.0
@@ -47,17 +66,18 @@ jobs:
             git commit --amend --no-edit
             git push -f origin
           fi
+
   run-tests:
-    name: Run Tests
     runs-on: ubuntu-latest
-    needs: eslint-prettier
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Install dependencies
         run: npm install
+
       - name: Run Tests
         run: npm run test
