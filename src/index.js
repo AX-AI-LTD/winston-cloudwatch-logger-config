@@ -25,10 +25,10 @@ async function ensureLogGroupExists({ logGroupName, cloudWatchLogsClient }) {
       logGroupNamePrefix: logGroupName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogGroupsCommand,
+      describeLogGroupsCommand
     );
     const logGroupExists = describeResponse.logGroups.some(
-      (group) => group.logGroupName === logGroupName,
+      (group) => group.logGroupName === logGroupName
     );
 
     if (logGroupExists) {
@@ -63,10 +63,10 @@ async function ensureLogStreamExists({
       logStreamNamePrefix: logStreamName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogStreamsCommand,
+      describeLogStreamsCommand
     );
     const logStreamExists = describeResponse.logStreams.some(
-      (stream) => stream.logStreamName === logStreamName,
+      (stream) => stream.logStreamName === logStreamName
     );
 
     if (logStreamExists) {
@@ -136,19 +136,25 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
         cloudWatchLogsClient,
       });
 
-      // Use the CloudWatch transport
+      const cloudWatchOptions = {
+        logGroupName: stream.logGroupName,
+        logStreamName: stream.logStreamName,
+        awsRegion: config.application.awsRegion,
+      };
+
+      // Conditionally add AWS credentials if they are defined
+      if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+        cloudWatchOptions.awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID;
+        cloudWatchOptions.awsSecretAccessKey =
+          process.env.AWS_SECRET_ACCESS_KEY;
+      }
+
+      console.log("cloudWatchOptions: ", cloudWatchOptions);
+      
       return winston.createLogger({
         level: stream.level,
         format: winston.format.json(),
-        transports: [
-          new WinstonCloudwatch({
-            logGroupName: stream.logGroupName,
-            logStreamName: stream.logStreamName,
-            awsRegion: config.application.awsRegion,
-            awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-          }),
-        ],
+        transports: [new WinstonCloudwatch(cloudWatchOptions)],
       });
     };
 
