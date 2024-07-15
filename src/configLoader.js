@@ -12,7 +12,7 @@ import pathInstance from "node:path";
  */
 const ConfigFactory = async ({ fs, path }) => {
   const configPath = path.resolve(process.cwd(), ".logger-config.json");
-
+  console.log("configPath: ", configPath);
   if (!fs.existsSync(configPath)) {
     throw new Error(`Configuration file not found: ${configPath}`);
   }
