@@ -41,7 +41,7 @@ jobs:
 
       - name: Authenticate remote origin
         run: |
-          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/AX-AI-LTD/claimToolWebServer.git
+          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/AX-AI-LTD/winston-cloudwatch-logger-config.git
 
       - name: Install ESLint and Prettier
         run: |
