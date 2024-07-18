@@ -35,7 +35,7 @@ const ensureLogGroupExists = async ({ logGroupName, cloudWatchLogsClient, awsSdk
       console.log(`CloudWatch Log Group already exists: ${logGroupName}`);
       return;
     }
-    const createLogGroupCommand = new CreateLogGroupCommand({ logGroupName });
+    const createLogGroupCommand = new awsSdk.CreateLogGroupCommand({ logGroupName });
     await cloudWatchLogsClient.send(createLogGroupCommand);
     console.log(`CloudWatch Log Group created: ${logGroupName}`);
   } catch (error) {
@@ -66,7 +66,7 @@ const ensureLogStreamExists = async ({
     const describeResponse = await cloudWatchLogsClient.send(
       describeLogStreamsCommand
     );
-    const logStreamExists = describeResponse.logStreams.some(
+    const logStreamExists = describeResponse.logStreams && describeResponse.logStreams.some(
       (stream) => stream.logStreamName === logStreamName
     );
 
