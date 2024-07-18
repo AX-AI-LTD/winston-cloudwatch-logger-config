@@ -1,6 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import LoggersFactory from "./src/index.js";
 
+vi.mock("@aws-sdk/client-cloudwatch-logs", () => {
+  return {
+    CloudWatchLogsClient: vi.fn(() => ({
+      send: vi.fn().mockResolvedValue({
+        logGroups: [],
+        logStreams: [],
+      }),
+    })),
+    DescribeLogGroupsCommand: vi.fn(),
+    CreateLogGroupCommand: vi.fn(),
+    DescribeLogStreamsCommand: vi.fn(),
+    CreateLogStreamCommand: vi.fn(),
+  };
+});
+
 describe("LoggersFactory", () => {
   process.env.AWS_ACCESS_KEY_ID = "mockAccessKeyId";
   process.env.AWS_SECRET_ACCESS_KEY = "mockSecretAccessKey";
@@ -33,14 +48,6 @@ describe("LoggersFactory", () => {
     },
   };
 
-  const AwsSdk = {
-    CloudWatchLogsClient: vi.fn(),
-    DescribeLogGroupsCommand: vi.fn(),
-    CreateLogGroupCommand: vi.fn(),
-    DescribeLogStreamsCommand: vi.fn(),
-    CreateLogStreamCommand: vi.fn(),
-  };
-
   const mockWinston = {
     createLogger: vi.fn(),
     format: {
@@ -55,7 +62,7 @@ describe("LoggersFactory", () => {
   const mockWinstonCloudwatch = vi.fn();
 
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should create file logger", async () => {
@@ -68,7 +75,6 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
-      AwsSdk
     });
 
     expect(loggers.fileLogger).toBeDefined();
@@ -121,16 +127,10 @@ describe("LoggersFactory", () => {
 
   it("should throw error if logger creation fails", async () => {
     const faultyConfig = { ...mockConfig, logStreams: null };
-    try {
-      await LoggersFactory({
-        config: faultyConfig,
-        winston: mockWinston,
-        WinstonCloudwatch: mockWinstonCloudwatch,
-      });
-    } catch (error) {
-      expect(error.message).toBe(
-        "Error creating loggers: Cannot read properties of null (reading 'length')"
-      );
-    }
+    await expect(LoggersFactory({
+      config: faultyConfig,
+      winston: mockWinston,
+      WinstonCloudwatch: mockWinstonCloudwatch,
+    })).rejects.toThrow("Error creating loggers: Cannot read properties of null (reading 'length')");
   });
 });
