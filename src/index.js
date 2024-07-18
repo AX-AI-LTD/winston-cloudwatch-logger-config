@@ -19,9 +19,13 @@ dotenv.config();
  *
  * @param {string} logGroupName - The name of the log group.
  */
-async function ensureLogGroupExists({ logGroupName, cloudWatchLogsClient }) {
+async function ensureLogGroupExists({
+  logGroupName,
+  cloudWatchLogsClient,
+  AwsSdk,
+}) {
   try {
-    const describeLogGroupsCommand = new DescribeLogGroupsCommand({
+    const describeLogGroupsCommand = new AwsSdk.DescribeLogGroupsCommand({
       logGroupNamePrefix: logGroupName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
@@ -35,7 +39,9 @@ async function ensureLogGroupExists({ logGroupName, cloudWatchLogsClient }) {
       console.log(`CloudWatch Log Group already exists: ${logGroupName}`);
       return;
     }
-    const createLogGroupCommand = new CreateLogGroupCommand({ logGroupName });
+    const createLogGroupCommand = new AwsSdk.CreateLogGroupCommand({
+      logGroupName,
+    });
     await cloudWatchLogsClient.send(createLogGroupCommand);
     console.log(`CloudWatch Log Group created: ${logGroupName}`);
   } catch (error) {
@@ -56,9 +62,10 @@ async function ensureLogStreamExists({
   logGroupName,
   logStreamName,
   cloudWatchLogsClient,
+  AwsSdk,
 }) {
   try {
-    const describeLogStreamsCommand = new DescribeLogStreamsCommand({
+    const describeLogStreamsCommand = new AwsSdk.DescribeLogStreamsCommand({
       logGroupName,
       logStreamNamePrefix: logStreamName,
     });
@@ -73,7 +80,7 @@ async function ensureLogStreamExists({
       console.log(`CloudWatch Log Stream already exists: ${logStreamName}`);
       return;
     }
-    const createLogStreamCommand = new CreateLogStreamCommand({
+    const createLogStreamCommand = new AwsSdk.CreateLogStreamCommand({
       logGroupName,
       logStreamName,
     });
@@ -98,10 +105,15 @@ async function ensureLogStreamExists({
  * @returns {Object} An object containing the created loggers.
  *
  */
-const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
+const LoggersFactory = async ({
+  config,
+  winston,
+  WinstonCloudwatch,
+  AwsSdk,
+}) => {
   try {
     console.log("config: ", config);
-    const cloudWatchLogsClient = new CloudWatchLogsClient({
+    const cloudWatchLogsClient = new AwsSdk.CloudWatchLogsClient({
       region: config.application.awsRegion,
     });
     const createLogger = async (stream) => {
@@ -129,11 +141,13 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
       await ensureLogGroupExists({
         logGroupName: stream.logGroupName,
         cloudWatchLogsClient,
+        AwsSdk,
       });
       await ensureLogStreamExists({
         logGroupName: stream.logGroupName,
         logStreamName: stream.logStreamName,
         cloudWatchLogsClient,
+        AwsSdk,
       });
 
       const cloudWatchOptions = {
@@ -150,7 +164,7 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
       }
 
       console.log("cloudWatchOptions: ", cloudWatchOptions);
-      
+
       return winston.createLogger({
         level: stream.level,
         format: winston.format.json(),
@@ -183,6 +197,13 @@ const instanceOrFactory = await returnInstanceOrFactory({
     config: configuration,
     winston: libWinston,
     WinstonCloudwatch: libWinstonCloudwatch,
+    AwsSdk: {
+      CloudWatchLogsClient,
+      DescribeLogGroupsCommand,
+      CreateLogGroupCommand,
+      DescribeLogStreamsCommand,
+      CreateLogStreamCommand,
+    },
   },
 });
 
