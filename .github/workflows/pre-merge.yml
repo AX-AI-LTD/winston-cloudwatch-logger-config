@@ -33,6 +33,17 @@ jobs:
       security-events: write
       actions: write
     steps:
+      - name: Check branch
+        run : | 
+          SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
+          
+          
+          if [["$SOURCE_BRANCH" == "staging" ]]; then
+            echo "Prettier tests are not run on the staging branch."
+            exit 0
+          fi
+          
+          echo "Pull request target branch is valid."
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -56,6 +67,7 @@ jobs:
 
       - name: Amend Commit and Push
         run: |
+          
           if [[ -z "$(git status -s)" ]]; then
             echo No Eslint and Prettier changes made
           else
@@ -64,7 +76,7 @@ jobs:
             git config --global user.name "GitHub Action"
             git add .
             git commit --amend --no-edit
-            git push -f origin
+            git push -f origin $SOURCE_BRANCH
           fi
 
   run-tests:

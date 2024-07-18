@@ -19,27 +19,29 @@ dotenv.config();
  *
  * @param {string} logGroupName - The name of the log group.
  */
-async function ensureLogGroupExists({
+const ensureLogGroupExists = async ({
   logGroupName,
   cloudWatchLogsClient,
-  AwsSdk,
-}) {
+  awsSdk,
+}) => {
   try {
-    const describeLogGroupsCommand = new AwsSdk.DescribeLogGroupsCommand({
+    const describeLogGroupsCommand = new awsSdk.DescribeLogGroupsCommand({
       logGroupNamePrefix: logGroupName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogGroupsCommand
+      describeLogGroupsCommand,
     );
-    const logGroupExists = describeResponse.logGroups.some(
-      (group) => group.logGroupName === logGroupName
-    );
+    const logGroupExists =
+      describeResponse.logGroups &&
+      describeResponse.logGroups.some(
+        (group) => group.logGroupName === logGroupName,
+      );
 
     if (logGroupExists) {
       console.log(`CloudWatch Log Group already exists: ${logGroupName}`);
       return;
     }
-    const createLogGroupCommand = new AwsSdk.CreateLogGroupCommand({
+    const createLogGroupCommand = new awsSdk.CreateLogGroupCommand({
       logGroupName,
     });
     await cloudWatchLogsClient.send(createLogGroupCommand);
@@ -50,7 +52,7 @@ async function ensureLogGroupExists({
       throw new Error(`Error ensuring log group exists: ${error.message}`);
     }
   }
-}
+};
 
 /**
  * Ensures that the specified CloudWatch log stream exists within a log group, and creates it if it does not.
@@ -58,29 +60,31 @@ async function ensureLogGroupExists({
  * @param {string} logGroupName - The name of the log group.
  * @param {string} logStreamName - The name of the log stream.
  */
-async function ensureLogStreamExists({
+const ensureLogStreamExists = async ({
   logGroupName,
   logStreamName,
   cloudWatchLogsClient,
-  AwsSdk,
-}) {
+  awsSdk,
+}) => {
   try {
-    const describeLogStreamsCommand = new AwsSdk.DescribeLogStreamsCommand({
+    const describeLogStreamsCommand = new awsSdk.DescribeLogStreamsCommand({
       logGroupName,
       logStreamNamePrefix: logStreamName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogStreamsCommand
+      describeLogStreamsCommand,
     );
-    const logStreamExists = describeResponse.logStreams.some(
-      (stream) => stream.logStreamName === logStreamName
-    );
+    const logStreamExists =
+      describeResponse.logStreams &&
+      describeResponse.logStreams.some(
+        (stream) => stream.logStreamName === logStreamName,
+      );
 
     if (logStreamExists) {
       console.log(`CloudWatch Log Stream already exists: ${logStreamName}`);
       return;
     }
-    const createLogStreamCommand = new AwsSdk.CreateLogStreamCommand({
+    const createLogStreamCommand = new awsSdk.CreateLogStreamCommand({
       logGroupName,
       logStreamName,
     });
@@ -92,7 +96,7 @@ async function ensureLogStreamExists({
       throw new Error(`Error ensuring log stream exists: ${error.message}`);
     }
   }
-}
+};
 
 /**
  * Factory function that creates and returns a set of loggers based on the provided configuration.
@@ -109,11 +113,11 @@ const LoggersFactory = async ({
   config,
   winston,
   WinstonCloudwatch,
-  AwsSdk,
+  awsSdk,
 }) => {
   try {
     console.log("config: ", config);
-    const cloudWatchLogsClient = new AwsSdk.CloudWatchLogsClient({
+    const cloudWatchLogsClient = new awsSdk.CloudWatchLogsClient({
       region: config.application.awsRegion,
     });
     const createLogger = async (stream) => {
@@ -141,13 +145,13 @@ const LoggersFactory = async ({
       await ensureLogGroupExists({
         logGroupName: stream.logGroupName,
         cloudWatchLogsClient,
-        AwsSdk,
+        awsSdk,
       });
       await ensureLogStreamExists({
         logGroupName: stream.logGroupName,
         logStreamName: stream.logStreamName,
         cloudWatchLogsClient,
-        AwsSdk,
+        awsSdk,
       });
 
       const cloudWatchOptions = {
@@ -197,7 +201,7 @@ const instanceOrFactory = await returnInstanceOrFactory({
     config: configuration,
     winston: libWinston,
     WinstonCloudwatch: libWinstonCloudwatch,
-    AwsSdk: {
+    awsSdk: {
       CloudWatchLogsClient,
       DescribeLogGroupsCommand,
       CreateLogGroupCommand,
