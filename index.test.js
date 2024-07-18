@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import LoggersFactory from "./src/index.js";
 
-vi.mock("@aws-sdk/client-cloudwatch-logs", () => {
-  return {
+vi.mock("@aws-sdk/client-cloudwatch-logs", () => ({
     CloudWatchLogsClient: vi.fn(() => ({
       send: vi.fn().mockResolvedValue({
         logGroups: [],
@@ -13,8 +12,7 @@ vi.mock("@aws-sdk/client-cloudwatch-logs", () => {
     CreateLogGroupCommand: vi.fn(),
     DescribeLogStreamsCommand: vi.fn(),
     CreateLogStreamCommand: vi.fn(),
-  };
-});
+  }));
 
 describe("LoggersFactory", () => {
   process.env.AWS_ACCESS_KEY_ID = "mockAccessKeyId";
