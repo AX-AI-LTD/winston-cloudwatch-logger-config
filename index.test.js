@@ -15,9 +15,6 @@ const mockAwsSdk = {
 };
 
 describe("LoggersFactory", () => {
-  process.env.AWS_ACCESS_KEY_ID = "mockAccessKeyId";
-  process.env.AWS_SECRET_ACCESS_KEY = "mockSecretAccessKey";
-  process.env.AWS_REGION = "us-east-1";
   const mockConfig = {
     application: {
       awsRegion: "us-east-1",
