@@ -2,16 +2,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import LoggersFactory from "./src/index.js";
 
 const mockAwsSdk = {
-  cloudWatchLogsClient: {
+  CloudWatchLogsClient: vi.fn().mockImplementation(() => ({
     send: vi.fn().mockResolvedValue({
       logGroups: [],
       logStreams: [],
     }),
-  },
-  DescribeLogGroupsCommand: vi.fn(),
-  CreateLogGroupCommand: vi.fn(),
-  DescribeLogStreamsCommand: vi.fn(),
-  CreateLogStreamCommand: vi.fn(),
+  })),
+  DescribeLogGroupsCommand: vi.fn().mockImplementation(() => ({})),
+  CreateLogGroupCommand: vi.fn().mockImplementation(() => ({})),
+  DescribeLogStreamsCommand: vi.fn().mockImplementation(() => ({})),
+  CreateLogStreamCommand: vi.fn().mockImplementation(() => ({})),
 };
 
 describe("LoggersFactory", () => {
@@ -124,6 +124,13 @@ describe("LoggersFactory", () => {
       format: mockWinston.format.json(),
       transports: [cloudwatchTransport],
     });
+    expect(mockAwsSdk.CloudWatchLogsClient).toHaveBeenCalledWith({
+      region: "us-east-1",
+    });
+    expect(mockAwsSdk.DescribeLogGroupsCommand).toHaveBeenCalled();
+    expect(mockAwsSdk.CreateLogGroupCommand).toHaveBeenCalled();
+    expect(mockAwsSdk.DescribeLogStreamsCommand).toHaveBeenCalled();
+    expect(mockAwsSdk.CreateLogStreamCommand).toHaveBeenCalled();
   });
 
   it("should throw error if logger creation fails", async () => {
