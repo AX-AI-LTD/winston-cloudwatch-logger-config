@@ -27,7 +27,7 @@ const ensureLogGroupExists = async ({ logGroupName, cloudWatchLogsClient, awsSdk
     const describeResponse = await cloudWatchLogsClient.send(
       describeLogGroupsCommand
     );
-    const logGroupExists = describeResponse.logGroups.some(
+    const logGroupExists = describeResponse.logGroups && describeResponse.logGroups.some(
       (group) => group.logGroupName === logGroupName
     );
 
