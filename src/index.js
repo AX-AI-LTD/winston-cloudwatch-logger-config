@@ -2,6 +2,13 @@ import dotenv from "dotenv";
 import libWinston from "winston";
 import libWinstonCloudwatch from "winston-cloudwatch";
 import { returnInstanceOrFactory } from "instance-or-factory";
+import {
+  CloudWatchLogsClient,
+  DescribeLogGroupsCommand,
+  CreateLogGroupCommand,
+  DescribeLogStreamsCommand,
+  CreateLogStreamCommand,
+} from "@aws-sdk/client-cloudwatch-logs"; // AWS SDK v3
 import configuration from "./configLoader.js";
 import LogFactory from "./LogFactory.js";
 
@@ -12,12 +19,12 @@ dotenv.config();
  *
  * @param {string} logGroupName - The name of the log group.
  */
-async function ensureLogGroupExists({ logGroupName, awsSdk }) {
+const ensureLogGroupExists = async ({ logGroupName, cloudWatchLogsClient, awsSdk }) => {
   try {
     const describeLogGroupsCommand = new awsSdk.DescribeLogGroupsCommand({
       logGroupNamePrefix: logGroupName,
     });
-    const describeResponse = await awsSdk.cloudWatchLogsClient.send(
+    const describeResponse = await cloudWatchLogsClient.send(
       describeLogGroupsCommand
     );
     const logGroupExists = describeResponse.logGroups.some(
@@ -28,8 +35,8 @@ async function ensureLogGroupExists({ logGroupName, awsSdk }) {
       console.log(`CloudWatch Log Group already exists: ${logGroupName}`);
       return;
     }
-    const createLogGroupCommand = new awsSdk.CreateLogGroupCommand({ logGroupName });
-    await awsSdk.cloudWatchLogsClient.send(createLogGroupCommand);
+    const createLogGroupCommand = new CreateLogGroupCommand({ logGroupName });
+    await cloudWatchLogsClient.send(createLogGroupCommand);
     console.log(`CloudWatch Log Group created: ${logGroupName}`);
   } catch (error) {
     if (error.name !== "ResourceAlreadyExistsException") {
@@ -45,17 +52,18 @@ async function ensureLogGroupExists({ logGroupName, awsSdk }) {
  * @param {string} logGroupName - The name of the log group.
  * @param {string} logStreamName - The name of the log stream.
  */
-async function ensureLogStreamExists({
+const ensureLogStreamExists = async ({
   logGroupName,
   logStreamName,
-  awsSdk,
-}) {
+  cloudWatchLogsClient,
+  awsSdk
+}) => {
   try {
     const describeLogStreamsCommand = new awsSdk.DescribeLogStreamsCommand({
       logGroupName,
       logStreamNamePrefix: logStreamName,
     });
-    const describeResponse = await awsSdk.cloudWatchLogsClient.send(
+    const describeResponse = await cloudWatchLogsClient.send(
       describeLogStreamsCommand
     );
     const logStreamExists = describeResponse.logStreams.some(
@@ -70,7 +78,7 @@ async function ensureLogStreamExists({
       logGroupName,
       logStreamName,
     });
-    await awsSdk.cloudWatchLogsClient.send(createLogStreamCommand);
+    await cloudWatchLogsClient.send(createLogStreamCommand);
     console.log(`CloudWatch Log Stream created: ${logStreamName}`);
   } catch (error) {
     if (error.name !== "ResourceAlreadyExistsException") {
@@ -94,6 +102,9 @@ async function ensureLogStreamExists({
 const LoggersFactory = async ({ config, winston, WinstonCloudwatch, awsSdk }) => {
   try {
     console.log("config: ", config);
+    const cloudWatchLogsClient = new awsSdk.CloudWatchLogsClient({
+      region: config.application.awsRegion,
+    });
     const createLogger = async (stream) => {
       if (stream.logGroupName === "file") {
         return winston.createLogger({
@@ -118,12 +129,14 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch, awsSdk }) =>
       // Ensure log group and log stream exist if not using file or console
       await ensureLogGroupExists({
         logGroupName: stream.logGroupName,
-        awsSdk,
+        cloudWatchLogsClient,
+        awsSdk
       });
       await ensureLogStreamExists({
         logGroupName: stream.logGroupName,
         logStreamName: stream.logStreamName,
-        awsSdk,
+        cloudWatchLogsClient,
+        awsSdk
       });
 
       const cloudWatchOptions = {
@@ -174,9 +187,7 @@ const instanceOrFactory = await returnInstanceOrFactory({
     winston: libWinston,
     WinstonCloudwatch: libWinstonCloudwatch,
     awsSdk: {
-      cloudWatchLogsClient: new CloudWatchLogsClient({
-        region: configuration.application.awsRegion,
-      }),
+      CloudWatchLogsClient,
       DescribeLogGroupsCommand,
       CreateLogGroupCommand,
       DescribeLogStreamsCommand,
