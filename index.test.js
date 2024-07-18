@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import LoggersFactory from "./src/index.js";
 
-vi.mock("@aws-sdk/client-cloudwatch-logs", () => ({
-    CloudWatchLogsClient: vi.fn(() => ({
-      send: vi.fn().mockResolvedValue({
-        logGroups: [],
-        logStreams: [],
-      }),
-    })),
-    DescribeLogGroupsCommand: vi.fn(),
-    CreateLogGroupCommand: vi.fn(),
-    DescribeLogStreamsCommand: vi.fn(),
-    CreateLogStreamCommand: vi.fn(),
-  }));
+const mockAwsSdk = {
+  cloudWatchLogsClient: {
+    send: vi.fn().mockResolvedValue({
+      logGroups: [],
+      logStreams: [],
+    }),
+  },
+  DescribeLogGroupsCommand: vi.fn(),
+  CreateLogGroupCommand: vi.fn(),
+  DescribeLogStreamsCommand: vi.fn(),
+  CreateLogStreamCommand: vi.fn(),
+};
 
 describe("LoggersFactory", () => {
   process.env.AWS_ACCESS_KEY_ID = "mockAccessKeyId";
