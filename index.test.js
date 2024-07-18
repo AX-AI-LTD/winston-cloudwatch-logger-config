@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import LoggersFactory from "./src/index.js";
 
 describe("LoggersFactory", () => {
+  process.env.AWS_ACCESS_KEY_ID = "mockAccessKeyId";
+  process.env.AWS_SECRET_ACCESS_KEY = "mockSecretAccessKey";
+  process.env.AWS_REGION = "us-east-1";
   const mockConfig = {
     application: {
       awsRegion: "us-east-1",
@@ -28,6 +31,14 @@ describe("LoggersFactory", () => {
       accessKeyId: "testAccessKeyId",
       secretAccessKey: "testSecretAccessKey",
     },
+  };
+
+  const AwsSdk = {
+    CloudWatchLogsClient: vi.fn(),
+    DescribeLogGroupsCommand: vi.fn(),
+    CreateLogGroupCommand: vi.fn(),
+    DescribeLogStreamsCommand: vi.fn(),
+    CreateLogStreamCommand: vi.fn(),
   };
 
   const mockWinston = {
@@ -57,6 +68,7 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      AwsSdk
     });
 
     expect(loggers.fileLogger).toBeDefined();
