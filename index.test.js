@@ -30,6 +30,19 @@ describe("LoggersFactory", () => {
     },
   };
 
+  const AwsSdk = {
+    CloudWatchLogsClient: vi.fn(() => ({
+      send: vi.fn().mockResolvedValue({
+        logGroups: [],
+        logStreams: []
+      })
+    })),
+    DescribeLogGroupsCommand: vi.fn(),
+    CreateLogGroupCommand: vi.fn(),
+    DescribeLogStreamsCommand: vi.fn(),
+    CreateLogStreamCommand: vi.fn(),
+  };
+
   const mockWinston = {
     createLogger: vi.fn(),
     format: {
@@ -57,6 +70,7 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      AwsSdk
     });
 
     expect(loggers.fileLogger).toBeDefined();
@@ -77,6 +91,7 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      AwsSdk,
     });
 
     expect(loggers.consoleLogger).toBeDefined();
@@ -97,6 +112,7 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      AwsSdk,
     });
 
     expect(loggers.cloudwatchLogger).toBeDefined();
@@ -114,6 +130,7 @@ describe("LoggersFactory", () => {
         config: faultyConfig,
         winston: mockWinston,
         WinstonCloudwatch: mockWinstonCloudwatch,
+        AwsSdk,
       });
     } catch (error) {
       expect(error.message).toBe(

@@ -19,23 +19,29 @@ dotenv.config();
  *
  * @param {string} logGroupName - The name of the log group.
  */
-async function ensureLogGroupExists({ logGroupName, cloudWatchLogsClient }) {
+async function ensureLogGroupExists({
+  logGroupName,
+  cloudWatchLogsClient,
+  AwsSdk,
+}) {
   try {
-    const describeLogGroupsCommand = new DescribeLogGroupsCommand({
+    const describeLogGroupsCommand = new AwsSdk.DescribeLogGroupsCommand({
       logGroupNamePrefix: logGroupName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogGroupsCommand,
+      describeLogGroupsCommand
     );
     const logGroupExists = describeResponse.logGroups.some(
-      (group) => group.logGroupName === logGroupName,
+      (group) => group.logGroupName === logGroupName
     );
 
     if (logGroupExists) {
       console.log(`CloudWatch Log Group already exists: ${logGroupName}`);
       return;
     }
-    const createLogGroupCommand = new CreateLogGroupCommand({ logGroupName });
+    const createLogGroupCommand = new AwsSdk.CreateLogGroupCommand({
+      logGroupName,
+    });
     await cloudWatchLogsClient.send(createLogGroupCommand);
     console.log(`CloudWatch Log Group created: ${logGroupName}`);
   } catch (error) {
@@ -56,24 +62,25 @@ async function ensureLogStreamExists({
   logGroupName,
   logStreamName,
   cloudWatchLogsClient,
+  AwsSdk,
 }) {
   try {
-    const describeLogStreamsCommand = new DescribeLogStreamsCommand({
+    const describeLogStreamsCommand = new AwsSdk.DescribeLogStreamsCommand({
       logGroupName,
       logStreamNamePrefix: logStreamName,
     });
     const describeResponse = await cloudWatchLogsClient.send(
-      describeLogStreamsCommand,
+      describeLogStreamsCommand
     );
     const logStreamExists = describeResponse.logStreams.some(
-      (stream) => stream.logStreamName === logStreamName,
+      (stream) => stream.logStreamName === logStreamName
     );
 
     if (logStreamExists) {
       console.log(`CloudWatch Log Stream already exists: ${logStreamName}`);
       return;
     }
-    const createLogStreamCommand = new CreateLogStreamCommand({
+    const createLogStreamCommand = new AwsSdk.CreateLogStreamCommand({
       logGroupName,
       logStreamName,
     });
@@ -98,10 +105,15 @@ async function ensureLogStreamExists({
  * @returns {Object} An object containing the created loggers.
  *
  */
-const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
+const LoggersFactory = async ({
+  config,
+  winston,
+  WinstonCloudwatch,
+  AwsSdk,
+}) => {
   try {
     console.log("config: ", config);
-    const cloudWatchLogsClient = new CloudWatchLogsClient({
+    const cloudWatchLogsClient = new AwsSdk.CloudWatchLogsClient({
       region: config.application.awsRegion,
     });
     const createLogger = async (stream) => {
@@ -129,26 +141,34 @@ const LoggersFactory = async ({ config, winston, WinstonCloudwatch }) => {
       await ensureLogGroupExists({
         logGroupName: stream.logGroupName,
         cloudWatchLogsClient,
+        AwsSdk,
       });
       await ensureLogStreamExists({
         logGroupName: stream.logGroupName,
         logStreamName: stream.logStreamName,
         cloudWatchLogsClient,
+        AwsSdk,
       });
 
-      // Use the CloudWatch transport
+      const cloudWatchOptions = {
+        logGroupName: stream.logGroupName,
+        logStreamName: stream.logStreamName,
+        awsRegion: config.application.awsRegion,
+      };
+
+      // Conditionally add AWS credentials if they are defined
+      if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+        cloudWatchOptions.awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID;
+        cloudWatchOptions.awsSecretAccessKey =
+          process.env.AWS_SECRET_ACCESS_KEY;
+      }
+
+      console.log("cloudWatchOptions: ", cloudWatchOptions);
+
       return winston.createLogger({
         level: stream.level,
         format: winston.format.json(),
-        transports: [
-          new WinstonCloudwatch({
-            logGroupName: stream.logGroupName,
-            logStreamName: stream.logStreamName,
-            awsRegion: config.application.awsRegion,
-            awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-          }),
-        ],
+        transports: [new WinstonCloudwatch(cloudWatchOptions)],
       });
     };
 
@@ -177,6 +197,13 @@ const instanceOrFactory = await returnInstanceOrFactory({
     config: configuration,
     winston: libWinston,
     WinstonCloudwatch: libWinstonCloudwatch,
+    AwsSdk: {
+      CloudWatchLogsClient,
+      DescribeLogGroupsCommand,
+      CreateLogGroupCommand,
+      DescribeLogStreamsCommand,
+      CreateLogStreamCommand,
+    },
   },
 });
 
