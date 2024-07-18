@@ -133,6 +133,47 @@ describe("LoggersFactory", () => {
     expect(mockAwsSdk.CreateLogStreamCommand).toHaveBeenCalled();
   });
 
+  it("should create a new logger when one does not exist", async () => {
+    const cloudwatchTransport = {};
+    const logger = { log: vi.fn() };
+    mockWinstonCloudwatch.mockReturnValue(cloudwatchTransport);
+    mockWinston.createLogger.mockReturnValue(logger);
+
+    // Mock that the log group doesn't exist
+    mockAwsSdk.CloudWatchLogsClient.mockImplementation(() => ({
+      send: vi.fn().mockImplementation((command) => {
+        if (command instanceof mockAwsSdk.DescribeLogGroupsCommand) {
+          return Promise.resolve({ logGroups: [] });
+        }
+        if (command instanceof mockAwsSdk.DescribeLogStreamsCommand) {
+          return Promise.resolve({ logStreams: [] });
+        }
+        return Promise.resolve({});
+      }),
+    }));
+
+    const loggers = await LoggersFactory({
+      config: mockConfig,
+      winston: mockWinston,
+      WinstonCloudwatch: mockWinstonCloudwatch,
+      awsSdk: mockAwsSdk,
+    });
+
+    expect(loggers.cloudwatchLogger).toBeDefined();
+    expect(mockAwsSdk.CloudWatchLogsClient).toHaveBeenCalledWith({
+      region: "us-east-1",
+    });
+    expect(mockAwsSdk.DescribeLogGroupsCommand).toHaveBeenCalled();
+    expect(mockAwsSdk.CreateLogGroupCommand).toHaveBeenCalled();
+    expect(mockAwsSdk.DescribeLogStreamsCommand).toHaveBeenCalled();
+    expect(mockAwsSdk.CreateLogStreamCommand).toHaveBeenCalled();
+    expect(mockWinston.createLogger).toHaveBeenCalledWith({
+      level: "error",
+      format: mockWinston.format.json(),
+      transports: [cloudwatchTransport],
+    });
+  });
+
   it.skip("should throw error if logger creation fails", async () => {
     const faultyConfig = { ...mockConfig, logStreams: null };
     await expect(LoggersFactory({
