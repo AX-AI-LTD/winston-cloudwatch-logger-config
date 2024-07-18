@@ -73,6 +73,7 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      awsSdk: mockAwsSdk,
     });
 
     expect(loggers.fileLogger).toBeDefined();
@@ -93,6 +94,7 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      awsSdk: mockAwsSdk,
     });
 
     expect(loggers.consoleLogger).toBeDefined();
@@ -113,6 +115,7 @@ describe("LoggersFactory", () => {
       config: mockConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      awsSdk: mockAwsSdk,
     });
 
     expect(loggers.cloudwatchLogger).toBeDefined();
@@ -129,6 +132,7 @@ describe("LoggersFactory", () => {
       config: faultyConfig,
       winston: mockWinston,
       WinstonCloudwatch: mockWinstonCloudwatch,
+      awsSdk: mockAwsSdk,
     })).rejects.toThrow("Error creating loggers: Cannot read properties of null (reading 'length')");
   });
 });
