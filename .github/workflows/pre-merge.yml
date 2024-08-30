@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check target branch
+      - name: Check target branch (main)
         run: |
           TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
           SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
@@ -26,6 +26,19 @@ jobs:
           fi
           
           echo "Pull request target branch is valid."
+      
+      - name: Check target branch (staging)
+        run: |
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+          SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
+              
+          if [[ "$TARGET_BRANCH" == "staging" && "$SOURCE_BRANCH" != "dev" && "$SOURCE_BRANCH" != "main" ]]; then
+            echo "Only the dev or main branches can be merged into the staging branch."
+            exit 1
+          fi
+                
+          echo "Pull request target branch is valid."
+
   eslint-prettier:
     runs-on: ubuntu-latest
     permissions:
