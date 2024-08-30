@@ -56,7 +56,6 @@ jobs:
 
       - name: Amend Commit and Push
         run: |
-          SOURCE_BRANCH="${{ github.event.pull_request.head.ref }}"
           if [[ -z "$(git status -s)" ]]; then
             echo No Eslint and Prettier changes made
           else
@@ -65,7 +64,7 @@ jobs:
             git config --global user.name "GitHub Action"
             git add .
             git commit --amend --no-edit
-            git push -f origin $SOURCE_BRANCH
+            git push -f origin
           fi
 
   run-tests:
